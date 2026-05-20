@@ -13,5 +13,6 @@ public class BookRequest {
     String title;
     String author;
     Double price;
+    Integer stock;
     Long categoryId;
 }

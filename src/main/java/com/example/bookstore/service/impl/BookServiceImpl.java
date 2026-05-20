@@ -59,6 +59,12 @@ public class BookServiceImpl implements BookService {
         // (Hoặc set thủ công nếu chưa cấu hình update mapping)
         existingBook.setTitle(request.getTitle());
         existingBook.setAuthor(request.getAuthor());
+        if (request.getPrice() != null) {
+            existingBook.setPrice(request.getPrice());
+        }
+        if (request.getStock() != null) {
+            existingBook.setStock(request.getStock());
+        }
 
         return bookMapper.toBookResponse(bookRepository.save(existingBook));
     }

@@ -36,6 +36,9 @@ public class Book {
     @Min(value = 0, message = "Price cannot be negative")
     private double price;
 
+    @Min(value = 0, message = "Stock cannot be negative")
+    private int stock = 0;
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     @JsonIgnore

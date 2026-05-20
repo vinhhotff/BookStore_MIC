@@ -1,0 +1,13 @@
+package com.example.bookstore.repository;
+
+import com.example.bookstore.model.Order;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface OrderRepository extends JpaRepository<Order, Long> {
+    // Tìm toàn bộ đơn hàng của 1 user cụ thể
+    List<Order> findByUserId(String userId);
+}

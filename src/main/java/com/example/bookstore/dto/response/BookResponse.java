@@ -10,6 +10,8 @@ public class BookResponse {
     Long id;
     String title;
     String author;
+    Double price;
+    Integer stock;
     String categoryName;
     LocalDate createdAt;
     LocalDate updatedAt;
