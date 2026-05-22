@@ -17,7 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/books")
-public class WelcomeController {
+public class BookController {
     @Autowired
     private BookService bookService;
 
@@ -29,7 +29,6 @@ public class WelcomeController {
     }
 
     @GetMapping("/{id}")
-
     public ApiResponse<BookResponse> getBook(@PathVariable long id) {
         return ApiResponse.<BookResponse>builder()
                 .result(bookService.getBookById(id))
@@ -62,7 +61,6 @@ public class WelcomeController {
                 .build();
     }
 
-    // FIX 1: Bọc ApiResponse cho API thêm sách vào Category
     @PostMapping("/categories/{categoryId}/books")
     public ApiResponse<BookResponse> addBookToCategory(@PathVariable Long categoryId,
             @RequestBody BookRequest bookRequest) {
@@ -72,8 +70,6 @@ public class WelcomeController {
                 .build();
     }
 
-    // FIX 2: Sửa tên path {categoryid} thành {categoryId} cho đồng nhất và bọc
-    // ApiResponse
     @GetMapping("/categories/{categoryId}/books")
     public ApiResponse<List<BookResponse>> getBooksByCategory(@PathVariable Long categoryId) {
         return ApiResponse.<List<BookResponse>>builder()
@@ -81,7 +77,6 @@ public class WelcomeController {
                 .build();
     }
 
-    // FIX 3: Bọc ApiResponse cho API tìm kiếm
     @GetMapping("/search")
     public ApiResponse<List<BookResponse>> getBooksByTitle(@RequestParam String title) {
         return ApiResponse.<List<BookResponse>>builder()

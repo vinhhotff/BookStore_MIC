@@ -37,7 +37,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_EXISTED));
 
         if (book.getStock() < quantity) {
-            throw new RuntimeException("Không đủ sách trong kho!");
+            throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
         }
 
         book.setStock(book.getStock() - quantity);
