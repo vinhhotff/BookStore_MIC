@@ -1,7 +1,9 @@
 package com.example.bookstore.service.impl;
 
+import com.example.bookstore.dto.response.OrderResponse;
 import com.example.bookstore.exception.AppException;
 import com.example.bookstore.exception.ErrorCode;
+import com.example.bookstore.mapper.OrderMapper;
 import com.example.bookstore.model.Book;
 import com.example.bookstore.model.Order;
 import com.example.bookstore.model.OrderItem;
@@ -17,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 
+/**
+ * Service implementation containing business logic for Order operations.
+ */
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -25,6 +30,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final EmailService emailService;
+    private final OrderMapper orderMapper;
 
     @Override
     @Transactional
@@ -59,7 +65,27 @@ public class OrderServiceImpl implements OrderService {
         order.setItems(List.of(orderItem));
         orderRepository.save(order);
 
-        // 8. Gửi Email thông báo (Chạy ngầm, không bắt user phải chờ)
+        // Send Email Confirmation asynchronously
         emailService.sendOrderConfirmation(user.getUsername());
+    }
+
+    @Override
+    public List<OrderResponse> getMyOrders() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        List<Order> orders = orderRepository.findByUserIdWithItems(user.getId());
+        return orders.stream()
+                .map(orderMapper::toOrderResponse)
+                .toList();
+    }
+
+    @Override
+    public List<OrderResponse> getAllOrders() {
+        List<Order> orders = orderRepository.findAllWithItems();
+        return orders.stream()
+                .map(orderMapper::toOrderResponse)
+                .toList();
     }
 }
