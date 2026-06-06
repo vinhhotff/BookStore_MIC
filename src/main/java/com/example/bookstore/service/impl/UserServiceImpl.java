@@ -7,6 +7,7 @@ import com.example.bookstore.exception.ErrorCode;
 import com.example.bookstore.mapper.UserMapper;
 import com.example.bookstore.model.User;
 import com.example.bookstore.model.Role;
+import com.example.bookstore.repository.RoleRepository;
 import com.example.bookstore.repository.UserRepository;
 import com.example.bookstore.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -36,7 +38,16 @@ public class UserServiceImpl implements UserService {
         // 3. Mã hóa mật khẩu trước khi lưu
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        user.setRoles(Set.of(Role.builder().name("USER").build()));
+        // Tự động kiểm tra và tạo vai trò USER trong database nếu chưa tồn tại
+        Role userRole = roleRepository.findById("USER").orElseGet(() -> {
+            Role newRole = Role.builder()
+                    .name("USER")
+                    .description("User role")
+                    .build();
+            return roleRepository.save(newRole);
+        });
+
+        user.setRoles(Set.of(userRole));
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
