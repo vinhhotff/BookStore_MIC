@@ -19,6 +19,7 @@ public enum ErrorCode {
     INSUFFICIENT_STOCK(1009, "Không đủ số lượng sách trong kho", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(1010, "Email đã được đăng ký sử dụng bởi tài khoản khác", HttpStatus.BAD_REQUEST),
     EMAIL_NOT_EXISTED(1011, "Email không tồn tại trong hệ thống", HttpStatus.NOT_FOUND),
+    CONCURRENCY_CONFLICT(1012, "Hệ thống đang bận do có nhiều yêu cầu đồng thời, vui lòng thử lại sau.", HttpStatus.CONFLICT),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

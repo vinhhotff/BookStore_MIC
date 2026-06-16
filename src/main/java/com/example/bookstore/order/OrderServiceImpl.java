@@ -13,6 +13,7 @@ import com.example.bookstore.order.OrderRepository;
 import com.example.bookstore.user.UserRepository;
 import com.example.bookstore.order.EmailService;
 import com.example.bookstore.order.OrderService;
+import com.example.bookstore.common.RetryOnConflict;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    @RetryOnConflict(maxRetries = 3, delayMs = 100)
     public void placeOrder(Long bookId, int quantity) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByEmail(email)
