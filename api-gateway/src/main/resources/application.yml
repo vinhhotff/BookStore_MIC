@@ -12,18 +12,24 @@ spring:
           uri: lb://identity-service
           predicates:
             - Path=/api/v1/auth/**, /api/v1/users/**, /api/v1/roles/**, /api/v1/permissions/**
+          filters:
+            - RewritePath=/api/v1/(?<segment>.*), /$\{segment}
 
         # Book Service Routes
         - id: book-service
           uri: lb://book-service
           predicates:
             - Path=/api/v1/books/**, /api/v1/categories/**
+          filters:
+            - RewritePath=/api/v1/(?<segment>.*), /$\{segment}
 
         # Order Service Routes
         - id: order-service
           uri: lb://order-service
           predicates:
             - Path=/api/v1/orders/**
+          filters:
+            - RewritePath=/api/v1/(?<segment>.*), /$\{segment}
 
 eureka:
   client:
