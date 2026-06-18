@@ -4,6 +4,35 @@ Tài liệu này đóng vai trò là **ngữ cảnh trung tâm (Context Handoff 
 
 ---
 
+## 👥 PHẦN 0: QUY TRÌNH PHÁT TRIỂN CHUẨN DOANH NGHIỆP (GITFLOW)
+
+Để vận hành dự án như một doanh nghiệp phần mềm thực tế, chúng ta tuân thủ quy trình GitFlow nghiêm ngặt. Tuyệt đối **không push trực tiếp** code lên nhánh `main` / `master`.
+
+### Quy trình các bước thực hiện cho mỗi bài học (Task):
+1. **Tạo nhánh Feature mới từ `main`:**
+   ```bash
+   git checkout main
+   git pull origin main
+   git checkout -b feature/extract-<service-name>
+   ```
+2. **Thực hiện Code & Test:**
+   * Viết code, cấu hình cho module mới.
+   * Biên dịch và chạy test cục bộ (`./mvnw clean compile`).
+3. **Commit theo chuẩn Conventional Commits:**
+   * Cú pháp: `<type>(<scope>): <subject>`
+   * Ví dụ: `feat(book): create book-service module`
+4. **Push nhánh Feature lên GitHub:**
+   ```bash
+   git push origin feature/extract-<service-name>
+   ```
+5. **Tạo Pull Request (PR) & Review:**
+   * Tạo PR từ nhánh feature vào nhánh `main` trên GitHub.
+   * Review code, kiểm tra CI/CD (nếu có).
+6. **Merge vào nhánh `main`:**
+   * Sau khi được phê duyệt (Approve), tiến hành merge PR vào `main` (Squash and Merge được khuyến khích).
+
+---
+
 ## 🛠️ PHẦN 1: BẢN THIẾT KẾ KIẾN TRÚC (ARCHITECTURAL BLUEPRINT)
 
 ### 1. Tại sao chuyển đổi và Đánh đổi (Trade-offs)
