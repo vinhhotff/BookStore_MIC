@@ -29,6 +29,7 @@
         <module>common-library</module>
         <module>eureka-server</module>
         <module>api-gateway</module>
+        <module>identity-service</module>
     </modules>
 
     <dependencyManagement>

@@ -1,0 +1,41 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: identity-service
+  
+  # H2 In-Memory Database for local development convenience
+  datasource:
+    url: jdbc:h2:mem:identitydb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+  # Disable Flyway for in-memory H2 development
+  flyway:
+    enabled: false
+
+# JWT Signature Key
+jwt:
+  signerKey: z8p4p8X9vY2bN5mR7qW1eT4uI0oP3aS6dF9gH2jK5lZ8x
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
