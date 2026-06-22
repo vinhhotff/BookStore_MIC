@@ -73,9 +73,11 @@ public class AuthenticationService {
         String jit = signedToken.getJWTClaimsSet().getJWTID();
         Date expiryTime = signedToken.getJWTClaimsSet().getExpirationTime();
 
+        long timeToLive = (expiryTime.getTime() - System.currentTimeMillis()) / 1000;
+
         InvalidatedToken invalidatedToken = InvalidatedToken.builder()
                 .id(jit)
-                .expiryTime(expiryTime)
+                .timeToLive(timeToLive)
                 .build();
 
         invalidatedTokenRepository.save(invalidatedToken);
@@ -87,9 +89,11 @@ public class AuthenticationService {
         var jit = signedJWT.getJWTClaimsSet().getJWTID();
         var expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
 
+        long timeToLive = (expiryTime.getTime() - System.currentTimeMillis()) / 1000;
+
         InvalidatedToken invalidatedToken = InvalidatedToken.builder()
                 .id(jit)
-                .expiryTime(expiryTime)
+                .timeToLive(timeToLive)
                 .build();
 
         invalidatedTokenRepository.save(invalidatedToken);

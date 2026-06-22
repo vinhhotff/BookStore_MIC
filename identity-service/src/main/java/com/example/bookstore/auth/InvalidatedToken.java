@@ -1,23 +1,24 @@
 package com.example.bookstore.auth;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
+import org.springframework.data.annotation.Id;
 import lombok.*;
 
 import java.util.Date;
 
-@Entity
+@RedisHash("InvalidatedToken")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Setter
 @Getter
-@Table(name = "InvalidatedToken")
 public class InvalidatedToken {
 
     @Id
     String id;
-    Date expiryTime;
+    
+    @TimeToLive
+    Long timeToLive;
 }

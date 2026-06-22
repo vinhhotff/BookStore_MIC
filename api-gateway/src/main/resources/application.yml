@@ -4,6 +4,14 @@ server:
 spring:
   application:
     name: api-gateway
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  signerKey: z8p4p8X9vY2bN5mR7qW1eT4uI0oP3aS6dF9gH2jK5lZ8x
+
   cloud:
     gateway:
       routes:
