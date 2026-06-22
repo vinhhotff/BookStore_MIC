@@ -3,6 +3,7 @@ package com.example.bookstore.book.adapter.out.persistence;
 import com.example.bookstore.book.domain.model.Book;
 import com.example.bookstore.book.domain.model.Category;
 import com.example.bookstore.book.domain.port.out.BookRepositoryPort;
+import com.example.bookstore.book.mapper.BookMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,59 +15,24 @@ import java.util.Optional;
 public class BookPersistenceAdapter implements BookRepositoryPort {
 
     private final SpringDataBookRepository repository;
+    private final BookMapper mapper;
 
     @Override
     public Book save(Book book) {
-        BookEntity entity = toEntity(book);
+        BookEntity entity = mapper.toEntity(book);
         BookEntity saved = repository.save(entity);
-        return toDomain(saved);
+        return mapper.toDomain(saved);
     }
 
     @Override
     public Optional<Book> findById(Long id) {
-        return repository.findById(id).map(this::toDomain);
+        return repository.findById(id).map(mapper::toDomain);
     }
 
     @Override
     public List<Book> findAll() {
         return repository.findAll().stream()
-                .map(this::toDomain)
+                .map(mapper::toDomain)
                 .toList();
-    }
-
-    private Book toDomain(BookEntity entity) {
-        Category category = null;
-        if (entity.getCategory() != null) {
-            category = new Category(entity.getCategory().getId(), entity.getCategory().getName());
-        }
-        return new Book(
-                entity.getId(),
-                entity.getTitle(),
-                entity.getAuthor(),
-                entity.getPrice(),
-                entity.getStock(),
-                category
-        );
-    }
-
-    private BookEntity toEntity(Book domain) {
-        if (domain == null) return null;
-        
-        CategoryEntity categoryEntity = null;
-        if (domain.category() != null) {
-            categoryEntity = CategoryEntity.builder()
-                    .id(domain.category().id())
-                    .name(domain.category().name())
-                    .build();
-        }
-
-        return BookEntity.builder()
-                .id(domain.id())
-                .title(domain.title())
-                .author(domain.author())
-                .price(domain.price())
-                .stock(domain.stock())
-                .category(categoryEntity)
-                .build();
     }
 }

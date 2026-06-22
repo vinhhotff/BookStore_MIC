@@ -5,6 +5,7 @@ import com.example.bookstore.book.domain.model.Category;
 import com.example.bookstore.book.domain.port.in.ManageBookUseCase;
 import com.example.bookstore.book.domain.port.out.BookRepositoryPort;
 import com.example.bookstore.book.domain.port.out.CategoryRepositoryPort;
+import com.example.bookstore.book.mapper.BookMapper;
 import com.example.bookstore.exception.AppException;
 import com.example.bookstore.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -20,20 +21,25 @@ public class ManageBookService implements ManageBookUseCase {
 
     private final BookRepositoryPort bookRepositoryPort;
     private final CategoryRepositoryPort categoryRepositoryPort;
+    private final BookMapper bookMapper;
+    private final com.example.bookstore.book.domain.port.out.ReviewPort reviewPort;
 
     @Override
     @Transactional
-    public Book createBook(String title, String author, double price, int stock, Long categoryId) {
-        Category category = categoryRepositoryPort.findById(categoryId)
+    public Book createBook(Book book) {
+        Category category = categoryRepositoryPort.findById(book.category().id())
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        Book book = new Book(null, title, author, price, stock, category);
-        return bookRepositoryPort.save(book);
+        Book newBook = bookMapper.updateCategory(book, category);
+        return bookRepositoryPort.save(newBook);
     }
 
     @Override
     public Optional<Book> getBook(Long id) {
-        return bookRepositoryPort.findById(id);
+        return bookRepositoryPort.findById(id).map(book -> {
+            Double rating = reviewPort.getAverageRating(id);
+            return book.withRating(rating);
+        });
     }
 
     @Override
@@ -54,5 +60,28 @@ public class ManageBookService implements ManageBookUseCase {
 
         Book updatedBook = book.withStock(newStock);
         return bookRepositoryPort.save(updatedBook);
+    }
+
+    @Override
+    @Transactional
+    public Book updateBook(Long id, Book updatedBook) {
+        Book book = bookRepositoryPort.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_EXISTED));
+
+        Category category = categoryRepositoryPort.findById(updatedBook.category().id())
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+
+        Book newBook = bookMapper.mergeForUpdate(book.id(), book.version(), updatedBook, category);
+        return bookRepositoryPort.save(newBook);
+    }
+
+    @Override
+    @Transactional
+    public Book applyDiscount(Long id, double percentage) {
+        Book book = bookRepositoryPort.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_EXISTED));
+
+        Book discountedBook = book.applyDiscount(percentage);
+        return bookRepositoryPort.save(discountedBook);
     }
 }

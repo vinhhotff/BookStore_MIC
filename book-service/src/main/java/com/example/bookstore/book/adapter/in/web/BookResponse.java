@@ -9,5 +9,6 @@ public record BookResponse(
     String author,
     Double price,
     Integer stock,
-    String categoryName
+    String categoryName,
+    Double rating
 ) {}

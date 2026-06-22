@@ -18,6 +18,7 @@ public class DataInitializer implements CommandLineRunner {
     private final CategoryRepositoryPort categoryRepositoryPort;
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public void run(String... args) throws Exception {
         log.info("--- Bắt đầu khởi tạo dữ liệu Catalog Sách & Thể loại cho Book Service ---");
 
@@ -46,16 +47,16 @@ public class DataInitializer implements CommandLineRunner {
         if (bookRepositoryPort.findAll().isEmpty()) {
             log.info("Không phát hiện sách trong database. Tiến hành tạo sách mẫu...");
 
-            bookRepositoryPort.save(new Book(null, "Clean Code: A Handbook of Agile Software Craftsmanship", "Robert C. Martin", 150000, 15, itCat));
-            bookRepositoryPort.save(new Book(null, "Design Patterns: Elements of Reusable Object-Oriented Software", "Erich Gamma", 220000, 8, itCat));
-            bookRepositoryPort.save(new Book(null, "Spring Boot in Action", "Craig Walls", 180000, 12, itCat));
+            bookRepositoryPort.save(new Book(null, "Clean Code: A Handbook of Agile Software Craftsmanship", "Robert C. Martin", 150000, 15, itCat, 0, 5.0));
+            bookRepositoryPort.save(new Book(null, "Design Patterns: Elements of Reusable Object-Oriented Software", "Erich Gamma", 220000, 8, itCat, 0, 5.0));
+            bookRepositoryPort.save(new Book(null, "Spring Boot in Action", "Craig Walls", 180000, 12, itCat, 0, 5.0));
 
-            bookRepositoryPort.save(new Book(null, "Đắc Nhân Tâm (How to Win Friends and Influence People)", "Dale Carnegie", 86000, 20, selfHelpCat));
-            bookRepositoryPort.save(new Book(null, "Nghĩ Giàu và Làm Giàu (Think and Grow Rich)", "Napoleon Hill", 95000, 25, selfHelpCat));
-            bookRepositoryPort.save(new Book(null, "Nhà Giả Kim (The Alchemist)", "Paulo Coelho", 79000, 30, selfHelpCat));
+            bookRepositoryPort.save(new Book(null, "Đắc Nhân Tâm (How to Win Friends and Influence People)", "Dale Carnegie", 86000, 20, selfHelpCat, 0, 5.0));
+            bookRepositoryPort.save(new Book(null, "Nghĩ Giàu và Làm Giàu (Think and Grow Rich)", "Napoleon Hill", 95000, 25, selfHelpCat, 0, 5.0));
+            bookRepositoryPort.save(new Book(null, "Nhà Giả Kim (The Alchemist)", "Paulo Coelho", 79000, 30, selfHelpCat, 0, 5.0));
 
-            bookRepositoryPort.save(new Book(null, "Tư Duy Nhanh Và Chậm (Thinking, Fast and Slow)", "Daniel Kahneman", 145000, 10, businessCat));
-            bookRepositoryPort.save(new Book(null, "Không Đến Một (Zero to One)", "Peter Thiel", 115000, 15, businessCat));
+            bookRepositoryPort.save(new Book(null, "Tư Duy Nhanh Và Chậm (Thinking, Fast and Slow)", "Daniel Kahneman", 145000, 10, businessCat, 0, 5.0));
+            bookRepositoryPort.save(new Book(null, "Không Đến Một (Zero to One)", "Peter Thiel", 115000, 15, businessCat, 0, 5.0));
 
             log.info("Khởi tạo sách mẫu thành công!");
         }

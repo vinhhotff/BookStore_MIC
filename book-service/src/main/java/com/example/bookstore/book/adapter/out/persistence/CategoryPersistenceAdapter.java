@@ -2,7 +2,9 @@ package com.example.bookstore.book.adapter.out.persistence;
 
 import com.example.bookstore.book.domain.model.Category;
 import com.example.bookstore.book.domain.port.out.CategoryRepositoryPort;
+import com.example.bookstore.book.mapper.BookMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -12,33 +14,24 @@ import java.util.Optional;
 public class CategoryPersistenceAdapter implements CategoryRepositoryPort {
 
     private final SpringDataCategoryRepository repository;
-
+    @Qualifier("bookMapper")
+    private final BookMapper mapper;
     @Override
     public Category save(Category category) {
-        CategoryEntity entity = toEntity(category);
+        CategoryEntity entity = mapper.toEntity(category);
         CategoryEntity saved = repository.save(entity);
-        return toDomain(saved);
+        return mapper.toDomain(saved);
     }
 
     @Override
     public Optional<Category> findById(Long id) {
-        return repository.findById(id).map(this::toDomain);
+        return repository.findById(id).map(mapper::toDomain);
     }
 
     @Override
     public Optional<Category> findByName(String name) {
-        return repository.findByName(name).map(this::toDomain);
+        return repository.findByName(name).map(mapper::toDomain);
     }
 
-    private Category toDomain(CategoryEntity entity) {
-        return new Category(entity.getId(), entity.getName());
-    }
 
-    private CategoryEntity toEntity(Category domain) {
-        if (domain == null) return null;
-        return CategoryEntity.builder()
-                .id(domain.id())
-                .name(domain.name())
-                .build();
-    }
 }
