@@ -78,11 +78,15 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
                     return unauthenticated(exchange);
                 }
 
-                // 5. Nếu an toàn, truyền userId xuống các Service bên dưới
+                // 5. Nếu an toàn, truyền userId và roles xuống các Service bên dưới
                 try {
                     String userId = signedJWT.getJWTClaimsSet().getSubject();
+                    String scope = signedJWT.getJWTClaimsSet().getStringClaim("scope");
+                    if (scope == null) scope = "";
+
                     ServerHttpRequest modifiedRequest = exchange.getRequest().mutate()
                             .header("X-User-Id", userId)
+                            .header("X-User-Roles", scope)
                             .build();
 
                     return chain.filter(exchange.mutate().request(modifiedRequest).build());

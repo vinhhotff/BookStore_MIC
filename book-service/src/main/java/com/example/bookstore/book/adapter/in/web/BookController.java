@@ -9,6 +9,7 @@ import com.example.bookstore.exception.ErrorCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
 
@@ -44,6 +45,7 @@ public class BookController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<BookResponse> addBook(@Valid @RequestBody BookRequest request) {
         Book bookToCreate = mapper.toDomain(request);
         Book created = manageBookUseCase.createBook(bookToCreate);
@@ -55,6 +57,7 @@ public class BookController {
     }
 
     @PutMapping("/{id}/stock")
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<BookResponse> updateStock(@PathVariable Long id, @RequestParam int quantity) {
         Book updated = manageBookUseCase.updateStock(id, quantity);
         return ApiResponse.<BookResponse>builder()
@@ -64,6 +67,7 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<BookResponse> updateBook(@PathVariable Long id, @Valid @RequestBody BookRequest request) {
         Book updatedBook = mapper.toDomain(request);
         Book updateBook = manageBookUseCase.updateBook(id, updatedBook);
@@ -74,6 +78,7 @@ public class BookController {
     }
 
     @PatchMapping("/{id}/discount")
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<BookResponse> applyDiscount(@PathVariable Long id, @RequestParam double percentage) {
         Book discountedBook = manageBookUseCase.applyDiscount(id, percentage);
         return ApiResponse.<BookResponse>builder()
