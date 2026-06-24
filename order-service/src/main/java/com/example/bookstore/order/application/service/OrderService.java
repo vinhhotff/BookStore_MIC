@@ -7,6 +7,8 @@ import com.example.bookstore.order.domain.Order;
 import com.example.bookstore.order.domain.OrderRepository;
 import com.example.bookstore.order.infrastructure.feign.BookClient;
 import com.example.bookstore.order.infrastructure.feign.BookResponse;
+import com.example.bookstore.order.infrastructure.kafka.OrderEventProducer;
+import com.example.bookstore.order.application.dto.OrderCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final BookClient bookClient;
+    private final OrderEventProducer orderEventProducer;
 
     @Transactional
     public OrderResponse placeOrder(OrderRequest request, String userId, String userRoles) {
@@ -56,6 +59,13 @@ public class OrderService {
         Order savedOrder = orderRepository.save(order);
 
         // TODO: (Chặng sau) Publish event ra Kafka để BookService trừ kho thực tế.
+        // Gửi Event ra Kafka
+        OrderCreatedEvent event = OrderCreatedEvent.builder()
+                .orderId(savedOrder.getId())
+                .bookId(savedOrder.getBookId())
+                .quantity(savedOrder.getQuantity())
+                .build();
+        orderEventProducer.sendOrderCreatedEvent(event);
 
         return OrderResponse.builder()
                 .id(savedOrder.getId())
