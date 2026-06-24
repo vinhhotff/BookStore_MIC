@@ -13,4 +13,5 @@ public class OrderCreatedEvent {
     private Long orderId;
     private Long bookId;
     private int quantity;
+    private String traceId;
 }

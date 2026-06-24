@@ -1,6 +1,7 @@
 package com.example.bookstore.book.infrastructure.kafka;
 
 import com.example.bookstore.book.application.dto.OrderCreatedEvent;
+import com.example.bookstore.book.application.dto.StockEvent;
 import com.example.bookstore.book.domain.port.in.ManageBookUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class OrderEventConsumer {
 
     private final ManageBookUseCase manageBookUseCase;
+    private final StockEventProducer stockEventProducer;
 
     @KafkaListener(topics = "order-events", groupId = "book-group")
     public void consumeOrderCreatedEvent(OrderCreatedEvent event) {
@@ -21,9 +23,25 @@ public class OrderEventConsumer {
             // Thực hiện trừ kho
             manageBookUseCase.updateStock(event.getBookId(), event.getQuantity());
             log.info("Trừ kho thành công cho sách ID: {}, số lượng: {}", event.getBookId(), event.getQuantity());
+
+            // Bắn Event thành công về Order Service
+            StockEvent stockEvent = StockEvent.builder()
+                    .orderId(event.getOrderId())
+                    .status("SUCCESS")
+                    .message("Trừ kho thành công")
+                    .build();
+            stockEventProducer.sendStockEvent(stockEvent);
+
         } catch (Exception e) {
-            log.error("Lỗi khi trừ kho cho sách ID: {}. Cần kích hoạt cơ chế bù trừ (Compensation/Saga) nếu cần thiết. Chi tiết: {}", event.getBookId(), e.getMessage());
-            // Trong hệ thống thực tế, nếu trừ kho thất bại, ta phải bắn lại Event "DeductFailed" để OrderService đổi trạng thái đơn hàng thành FAILED.
+            log.error("Lỗi khi trừ kho cho sách ID: {}. Gửi báo cáo thất bại về Order Service. Chi tiết: {}", event.getBookId(), e.getMessage());
+
+            // Bắn Event thất bại về Order Service
+            StockEvent stockEvent = StockEvent.builder()
+                    .orderId(event.getOrderId())
+                    .status("FAILED")
+                    .message(e.getMessage())
+                    .build();
+            stockEventProducer.sendStockEvent(stockEvent);
         }
     }
 }

@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderCreatedEvent {
+public class StockEvent {
     private Long orderId;
-    private Long bookId;
-    private int quantity;
-    private String traceId;
+    private String status; // SUCCESS or FAILED
+    private String message;
 }

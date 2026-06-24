@@ -25,14 +25,11 @@ public class OrderService {
 
     @Transactional
     public OrderResponse placeOrder(OrderRequest request, String userId, String userRoles) {
-        log.info("Bắt đầu xử lý đặt hàng cho user: {}, book: {}", userId, request.getBookId());
-
         // 1. Gọi Book Service qua OpenFeign để kiểm tra sách
         ApiResponse<BookResponse> bookApiResp;
         try {
             bookApiResp = bookClient.getBookById(request.getBookId(), userId, userRoles);
         } catch (Exception e) {
-            log.error("Lỗi khi gọi Book Service: {}", e.getMessage());
             throw new RuntimeException("Không thể kết nối tới Book Service hoặc sách không tồn tại");
         }
 
@@ -58,12 +55,11 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        // TODO: (Chặng sau) Publish event ra Kafka để BookService trừ kho thực tế.
-        // Gửi Event ra Kafka
         OrderCreatedEvent event = OrderCreatedEvent.builder()
                 .orderId(savedOrder.getId())
                 .bookId(savedOrder.getBookId())
                 .quantity(savedOrder.getQuantity())
+                .traceId(org.slf4j.MDC.get("traceId"))
                 .build();
         orderEventProducer.sendOrderCreatedEvent(event);
 
@@ -76,5 +72,19 @@ public class OrderService {
                 .status(savedOrder.getStatus())
                 .createdAt(savedOrder.getCreatedAt())
                 .build();
+    }
+
+    /**
+     * Cập nhật trạng thái đơn hàng (sử dụng cho luồng xử lý bất đồng bộ từ Kafka).
+     *
+     * @param orderId ID của đơn hàng
+     * @param status  Trạng thái mới (COMPLETED hoặc FAILED)
+     */
+    @Transactional
+    public void updateOrderStatus(Long orderId, String status) {
+        orderRepository.findById(orderId).ifPresent(order -> {
+            order.setStatus(status);
+            orderRepository.save(order);
+        });
     }
 }

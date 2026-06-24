@@ -9,9 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderCreatedEvent {
+public class StockReservationResultEvent {
     private Long orderId;
     private Long bookId;
     private int quantity;
+    private boolean success;
+    private String reason;
     private String traceId;
 }

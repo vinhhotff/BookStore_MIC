@@ -41,6 +41,12 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Spring Cloud OpenFeign (for FeignTraceIdInterceptor) -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>

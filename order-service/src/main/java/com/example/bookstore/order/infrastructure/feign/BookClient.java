@@ -11,8 +11,7 @@ public interface BookClient {
 
     @GetMapping("/{id}")
     ApiResponse<BookResponse> getBookById(
-            @PathVariable("id") Long id, 
-            @RequestHeader("X-User-Id") String userId, 
-            @RequestHeader("X-User-Roles") String roles
-    );
+            @PathVariable("id") Long id,
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-User-Roles") String roles);
 }
