@@ -29,4 +29,17 @@ public class OrderController {
                 .result(response)
                 .build();
     }
+
+    @GetMapping("/my-orders")
+    @PreAuthorize("hasRole('USER')")
+    public ApiResponse<java.util.List<OrderResponse>> getMyOrders(
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader(value = "X-User-Roles", defaultValue = "") String roles) {
+
+        java.util.List<OrderResponse> responses = orderService.getOrderHistory(userId, roles);
+        return ApiResponse.<java.util.List<OrderResponse>>builder()
+                .message("Lấy lịch sử mua hàng thành công")
+                .result(responses)
+                .build();
+    }
 }

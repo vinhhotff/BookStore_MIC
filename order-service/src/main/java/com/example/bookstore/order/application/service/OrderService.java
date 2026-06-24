@@ -83,11 +83,41 @@ public class OrderService {
                 .id(savedOrder.getId())
                 .userId(savedOrder.getUserId())
                 .bookId(savedOrder.getBookId())
+                .bookTitle(book.getTitle())
                 .quantity(savedOrder.getQuantity())
                 .totalPrice(savedOrder.getTotalPrice())
                 .status(savedOrder.getStatus())
                 .createdAt(savedOrder.getCreatedAt())
                 .build();
+    }
+
+    public java.util.List<OrderResponse> getOrderHistory(String userId, String userRoles) {
+        // 1. Lấy danh sách đơn hàng từ Database nội bộ
+        java.util.List<Order> orders = orderRepository.findByUserId(userId);
+
+        // 2. API Composition: Lặp qua từng đơn hàng và lấy tên sách từ Book Service
+        return orders.stream().map(order -> {
+            String bookTitle = "Không rõ";
+            try {
+                ApiResponse<BookResponse> bookApiResp = bookClient.getBookById(order.getBookId(), userId, userRoles);
+                if (bookApiResp != null && bookApiResp.getResult() != null) {
+                    bookTitle = bookApiResp.getResult().getTitle();
+                }
+            } catch (Exception e) {
+                log.error("Lỗi khi lấy thông tin sách ID: {}", order.getBookId(), e);
+            }
+
+            return OrderResponse.builder()
+                    .id(order.getId())
+                    .userId(order.getUserId())
+                    .bookId(order.getBookId())
+                    .bookTitle(bookTitle)
+                    .quantity(order.getQuantity())
+                    .totalPrice(order.getTotalPrice())
+                    .status(order.getStatus())
+                    .createdAt(order.getCreatedAt())
+                    .build();
+        }).collect(java.util.stream.Collectors.toList());
     }
 
     /**
