@@ -16,14 +16,10 @@ public class StockEventConsumer {
 
     @KafkaListener(topics = "stock-events", groupId = "order-group")
     public void consumeStockEvent(StockEvent event) {
-        log.info("Nhận được Event báo cáo kho từ Book Service: {}", event);
-
         if ("SUCCESS".equals(event.getStatus())) {
             orderService.updateOrderStatus(event.getOrderId(), "COMPLETED");
-            log.info("Đơn hàng {} đã được cập nhật thành COMPLETED", event.getOrderId());
         } else {
             orderService.updateOrderStatus(event.getOrderId(), "FAILED");
-            log.warn("Đơn hàng {} đã bị hủy (FAILED) do: {}", event.getOrderId(), event.getMessage());
         }
     }
 }

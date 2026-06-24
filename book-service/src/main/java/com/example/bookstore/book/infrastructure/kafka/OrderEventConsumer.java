@@ -18,11 +18,9 @@ public class OrderEventConsumer {
 
     @KafkaListener(topics = "order-events", groupId = "book-group")
     public void consumeOrderCreatedEvent(OrderCreatedEvent event) {
-        log.info("Nhận được Event đặt hàng từ Kafka: {}", event);
         try {
-            // Thực hiện trừ kho
+            // Trừ kho
             manageBookUseCase.updateStock(event.getBookId(), event.getQuantity());
-            log.info("Trừ kho thành công cho sách ID: {}, số lượng: {}", event.getBookId(), event.getQuantity());
 
             // Bắn Event thành công về Order Service
             StockEvent stockEvent = StockEvent.builder()
@@ -33,8 +31,6 @@ public class OrderEventConsumer {
             stockEventProducer.sendStockEvent(stockEvent);
 
         } catch (Exception e) {
-            log.error("Lỗi khi trừ kho cho sách ID: {}. Gửi báo cáo thất bại về Order Service. Chi tiết: {}", event.getBookId(), e.getMessage());
-
             // Bắn Event thất bại về Order Service
             StockEvent stockEvent = StockEvent.builder()
                     .orderId(event.getOrderId())

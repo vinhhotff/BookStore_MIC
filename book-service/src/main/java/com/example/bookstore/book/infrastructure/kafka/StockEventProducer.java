@@ -15,7 +15,6 @@ public class StockEventProducer {
     private static final String TOPIC = "stock-events";
 
     public void sendStockEvent(StockEvent event) {
-        log.info("Đang gửi Event trừ kho lên Kafka: {}", event);
         kafkaTemplate.send(TOPIC, String.valueOf(event.getOrderId()), event);
     }
 }
