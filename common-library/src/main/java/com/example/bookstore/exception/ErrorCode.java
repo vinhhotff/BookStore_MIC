@@ -19,6 +19,7 @@ public enum ErrorCode {
     EMAIL_NOT_EXISTED(1011, "Email không tồn tại trong hệ thống", HttpStatus.NOT_FOUND),
     CONCURRENCY_CONFLICT(1012, "Hệ thống đang bận do có nhiều yêu cầu đồng thời, vui lòng thử lại sau.", HttpStatus.CONFLICT),
     INVALID_DISCOUNT(1013, "Mức giảm giá không hợp lệ (phải từ 0 đến 100)", HttpStatus.BAD_REQUEST),
+    SERVICE_UNAVAILABLE(1014, "Dịch vụ đang bảo trì hoặc quá tải, vui lòng thử lại sau.", HttpStatus.SERVICE_UNAVAILABLE),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
