@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderCreatedEvent {
+    private String eventId;
     private Long orderId;
     private Long bookId;
     private int quantity;

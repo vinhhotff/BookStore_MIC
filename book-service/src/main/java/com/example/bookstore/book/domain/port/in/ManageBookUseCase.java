@@ -11,4 +11,5 @@ public interface ManageBookUseCase {
     Book updateStock(Long id, int quantity);
     Book updateBook(Long id, Book updatedBook);
     Book applyDiscount(Long id, double percentage);
+    void processOrderCreatedEvent(com.example.bookstore.book.application.dto.OrderCreatedEvent event);
 }

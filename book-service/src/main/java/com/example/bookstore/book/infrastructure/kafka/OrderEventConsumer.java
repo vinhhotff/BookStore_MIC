@@ -19,8 +19,8 @@ public class OrderEventConsumer {
     @KafkaListener(topics = "order-events", groupId = "book-group")
     public void consumeOrderCreatedEvent(OrderCreatedEvent event) {
         try {
-            // Trừ kho
-            manageBookUseCase.updateStock(event.getBookId(), event.getQuantity());
+            // Trừ kho & chống trùng lặp (Idempotency)
+            manageBookUseCase.processOrderCreatedEvent(event);
 
             // Bắn Event thành công về Order Service
             StockEvent stockEvent = StockEvent.builder()

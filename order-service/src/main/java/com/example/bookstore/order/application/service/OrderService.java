@@ -21,7 +21,8 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final BookClient bookClient;
-    private final OrderEventProducer orderEventProducer;
+    private final com.example.bookstore.order.domain.OutboxEventRepository outboxEventRepository;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     @Transactional
     public OrderResponse placeOrder(OrderRequest request, String userId, String userRoles) {
@@ -55,13 +56,28 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
+        String eventId = java.util.UUID.randomUUID().toString();
         OrderCreatedEvent event = OrderCreatedEvent.builder()
+                .eventId(eventId)
                 .orderId(savedOrder.getId())
                 .bookId(savedOrder.getBookId())
                 .quantity(savedOrder.getQuantity())
                 .traceId(org.slf4j.MDC.get("traceId"))
                 .build();
-        orderEventProducer.sendOrderCreatedEvent(event);
+        
+        try {
+            com.example.bookstore.order.domain.OutboxEvent outboxEvent = com.example.bookstore.order.domain.OutboxEvent.builder()
+                    .id(eventId)
+                    .aggregateId(savedOrder.getId().toString())
+                    .eventType("OrderCreatedEvent")
+                    .payload(objectMapper.writeValueAsString(event))
+                    .isPublished(false)
+                    .createdAt(java.time.LocalDateTime.now())
+                    .build();
+            outboxEventRepository.save(outboxEvent);
+        } catch (Exception e) {
+            throw new RuntimeException("Không thể lưu OutboxEvent", e);
+        }
 
         return OrderResponse.builder()
                 .id(savedOrder.getId())

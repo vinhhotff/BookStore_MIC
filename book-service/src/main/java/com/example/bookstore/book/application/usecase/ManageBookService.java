@@ -23,6 +23,7 @@ public class ManageBookService implements ManageBookUseCase {
     private final CategoryRepositoryPort categoryRepositoryPort;
     private final BookMapper bookMapper;
     private final com.example.bookstore.book.domain.port.out.ReviewPort reviewPort;
+    private final com.example.bookstore.book.domain.ProcessedEventRepository processedEventRepository;
 
     @Override
     @Transactional
@@ -83,5 +84,30 @@ public class ManageBookService implements ManageBookUseCase {
 
         Book discountedBook = book.applyDiscount(percentage);
         return bookRepositoryPort.save(discountedBook);
+    }
+
+    @Override
+    @Transactional
+    public void processOrderCreatedEvent(com.example.bookstore.book.application.dto.OrderCreatedEvent event) {
+        if (event.getEventId() == null) {
+            // Fallback if eventId is missing, though we should log a warning
+            updateStock(event.getBookId(), event.getQuantity());
+            return;
+        }
+
+        boolean alreadyProcessed = processedEventRepository.existsById(event.getEventId());
+        if (alreadyProcessed) {
+            throw new RuntimeException("Duplicate event ignored: " + event.getEventId());
+        }
+
+        // 1. Trừ kho
+        updateStock(event.getBookId(), event.getQuantity());
+
+        // 2. Lưu lại eventId để chống trùng lặp
+        com.example.bookstore.book.domain.ProcessedEvent processedEvent = com.example.bookstore.book.domain.ProcessedEvent.builder()
+                .eventId(event.getEventId())
+                .processedAt(java.time.LocalDateTime.now())
+                .build();
+        processedEventRepository.save(processedEvent);
     }
 }
