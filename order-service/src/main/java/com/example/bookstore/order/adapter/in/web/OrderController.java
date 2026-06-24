@@ -7,6 +7,7 @@ import com.example.bookstore.order.application.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/orders")
@@ -16,6 +17,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
+    @PreAuthorize("hasRole('USER')")
     public ApiResponse<OrderResponse> placeOrder(
             @Valid @RequestBody OrderRequest request,
             @RequestHeader("X-User-Id") String userId,
