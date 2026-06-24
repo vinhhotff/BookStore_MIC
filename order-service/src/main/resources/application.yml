@@ -49,6 +49,14 @@ eureka:
 jwt:
   signerKey: "P@ssw0rd123456789012345678901234567890"
 
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{service:-}, %X{traceId:-}] %logger{36} - %msg%n"

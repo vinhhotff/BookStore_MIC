@@ -38,12 +38,6 @@ services:
       - redis_data:/data
     restart: always
 
-# Khai báo phân vùng lưu trữ dữ liệu lâu dài
-volumes:
-  postgres_data:
-  redis_data:
-  kafka_data:
-
   # Dịch vụ Apache Kafka (chạy chế độ KRaft, không cần Zookeeper)
   kafka:
     image: bitnami/kafka:latest
@@ -62,3 +56,17 @@ volumes:
     volumes:
       - kafka_data:/bitnami/kafka
     restart: always
+
+  # Dịch vụ Zipkin cho Distributed Tracing
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: bookstore-zipkin
+    ports:
+      - "9411:9411"
+    restart: always
+
+# Khai báo phân vùng lưu trữ dữ liệu lâu dài
+volumes:
+  postgres_data:
+  redis_data:
+  kafka_data:
